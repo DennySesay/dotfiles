@@ -2,6 +2,8 @@
 
 My personal Hyprland desktop configurations, managed cleanly with GNU Stow.
 
+![Desktop Screenshot](assets/screenshot.png)
+
 ## 🚀 Components Included
 * **Hyprland**: Configured via a modular Lua configuration system.
 * **Waybar**: Clean desktop status bar.
@@ -11,7 +13,7 @@ My personal Hyprland desktop configurations, managed cleanly with GNU Stow.
   * `Alt + C`: Clipboard History
   * `Alt + X`: Screenshot Menu
   * Clicking Waybar icons opens these menus directly.
-* **Wallpapers**: Curated wallpaper selection linked via Stow.
+* **Wallpapers**: Curated wallpaper selection stored directly in `wallpapers/`.
 
 ## ⚙️ Installation
 
@@ -24,3 +26,6 @@ My personal Hyprland desktop configurations, managed cleanly with GNU Stow.
    cd ~/dotfiles
    stow hypr waybar fuzzel bin
    ```
+
+## 🤝 Credits
+* The Waybar configuration was mostly provided by **HANCORE**, but modified by me to make it work on normal Hyprland and adapted to work with Fuzzel.
