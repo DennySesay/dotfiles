@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+# Cleanup background jobs on exit
+cleanup() {
+    bluetoothctl scan off >/dev/null 2>&1
+    kill $(jobs -p) >/dev/null 2>&1
+}
+trap cleanup EXIT
+
+# Start background scan immediately to collect devices instantly
+bluetoothctl scan on >/dev/null 2>&1 &
+
+# Small sleep to let the scan register
+sleep 0.2
+
+# Check bluetooth power state
+power_state=$(bluetoothctl show | grep "Powered:" | awk '{print $2}')
+
+if [[ "$power_state" == "yes" ]]; then
+    toggle="󰂲  Disable Bluetooth"
+else
+    toggle="󰂯  Enable Bluetooth"
+fi
+
+# Function to get devices list
+get_devices() {
+    bluetoothctl devices | awk '{$1=$2=""; print $0}' | sed -E 's/^[[:space:]]+//'
+}
+
+# Show main menu
+show_main_menu() {
+    if [[ "$power_state" == "yes" ]]; then
+        devices=$(get_devices)
+        menu_options="$toggle\n󰂰  Pair New Devices\n󰑐  Refresh List\n$devices"
+    else
+        menu_options="$toggle"
+    fi
+
+    # Calculate dynamic lines to prevent empty space (cap at 10)
+    options_count=$(echo -e "$menu_options" | grep -v -E '^$' | wc -l)
+    lines=$(( options_count < 10 ? options_count : 10 ))
+
+    selected=$(echo -e "$menu_options" | fuzzel \
+      --dmenu \
+      --width=40 \
+      --lines="$lines" \
+      --prompt="Bluetooth  ")
+
+    [[ -z "$selected" ]] && exit 0
+
+    if [[ "$selected" == "$toggle" ]]; then
+        if [[ "$power_state" == "yes" ]]; then
+            bluetoothctl power off
+            notify-send "Bluetooth" "Disabled" --icon=bluetooth
+        else
+            bluetoothctl power on
+            notify-send "Bluetooth" "Enabled" --icon=bluetooth
+            sleep 0.5
+            exec "$0"
+        fi
+    elif [[ "$selected" == *"Refresh List"* ]]; then
+        exec "$0"
+    elif [[ "$selected" == *"Pair New Devices"* ]]; then
+        show_pair_menu
+    else
+        # Toggles connection of paired device
+        mac=$(bluetoothctl devices | grep "$selected" | awk '{print $2}')
+        if [[ ! -z "$mac" ]]; then
+            info=$(bluetoothctl info "$mac")
+            if echo "$info" | grep -q "Connected: yes"; then
+                bluetoothctl disconnect "$mac"
+                notify-send "Bluetooth" "Disconnected from $selected" --icon=bluetooth
+            else
+                notify-send "Bluetooth" "Connecting to $selected..." --icon=bluetooth
+                if bluetoothctl connect "$mac"; then
+                    notify-send "Bluetooth" "Connected to $selected" --icon=bluetooth
+                else
+                    notify-send "Bluetooth" "Connection failed" --icon=bluetooth
+                fi
+            fi
+        fi
+        exec "$0"
+    fi
+}
+
+show_pair_menu() {
+    scanned_devices=$(get_devices)
+    menu_options="󰜎  Back to Menu\n󰑐  Rescan / Refresh\n$scanned_devices"
+    
+    # Calculate dynamic lines for pair menu
+    options_count=$(echo -e "$menu_options" | grep -v -E '^$' | wc -l)
+    lines=$(( options_count < 10 ? options_count : 10 ))
+
+    selected_new=$(echo -e "$menu_options" | fuzzel \
+      --dmenu \
+      --width=40 \
+      --lines="$lines" \
+      --prompt="Pair Device  ")
+      
+    if [[ -z "$selected_new" || "$selected_new" == *"Back to Menu"* ]]; then
+        show_main_menu
+    elif [[ "$selected_new" == *"Rescan"* ]]; then
+        sleep 1
+        show_pair_menu
+    else
+        mac=$(bluetoothctl devices | grep "$selected_new" | awk '{print $2}')
+        if [[ ! -z "$mac" ]]; then
+            notify-send "Bluetooth" "Pairing with $selected_new..." --icon=bluetooth
+            if bluetoothctl pair "$mac" && bluetoothctl trust "$mac" && bluetoothctl connect "$mac"; then
+                notify-send "Bluetooth" "Successfully paired and connected to $selected_new" --icon=bluetooth
+            else
+                notify-send "Bluetooth" "Failed to pair with $selected_new" --icon=bluetooth
+            fi
+        fi
+        exec "$0"
+    fi
+}
+
+# Run the menu
+show_main_menu

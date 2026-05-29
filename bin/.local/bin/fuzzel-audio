@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# Function to get audio targets (sinks/outputs or sources/inputs)
+get_targets() {
+    type="$1" # "Sinks" or "Sources"
+    wpctl status | sed -n "/$type:/,/^$/p" | grep -E '[0-9]+\.' | sed -E 's/[│*]//g' | sed -E 's/^[[:space:]]+//'
+}
+
+# Prompt user for Outputs (Sinks) or Inputs (Sources)
+category_options="󰓃  Outputs (Sinks)\n󰍬  Inputs (Sources)"
+lines_cat=$(echo -e "$category_options" | grep -v -E '^$' | wc -l)
+
+category=$(echo -e "$category_options" | fuzzel \
+  --dmenu \
+  --width=20 \
+  --lines="$lines_cat" \
+  --prompt="Audio Category  ")
+
+[[ -z "$category" ]] && exit 0
+
+if [[ "$category" == *"Outputs"* ]]; then
+    target_type="Sinks"
+    prompt_msg="Select Output  "
+else
+    target_type="Sources"
+    prompt_msg="Select Input  "
+fi
+
+# List targets
+targets_list=$(get_targets "$target_type")
+
+# Calculate dynamic lines for devices list (cap at 10)
+lines_devices=$(echo "$targets_list" | grep -v -E '^$' | wc -l)
+lines_devices=$(( lines_devices < 10 ? lines_devices : 10 ))
+
+selected=$(echo "$targets_list" | fuzzel \
+  --dmenu \
+  --width=60 \
+  --lines="$lines_devices" \
+  --prompt="$prompt_msg")
+
+[[ -z "$selected" ]] && exit 0
+
+# Extract the ID from the selected target (first number before dot)
+id=$(echo "$selected" | awk -F'.' '{print $1}' | xargs)
+
+# Set default device
+if [[ ! -z "$id" ]]; then
+    wpctl set-default "$id"
+    device_name=$(echo "$selected" | sed -E 's/^[0-9]+\.[[:space:]]*//' | sed -E 's/\[vol:.*\]//')
+    notify-send "Audio Device Switched" "Default set to: $device_name" --icon=audio-speakers
+fi

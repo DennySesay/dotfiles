@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Fetch clipboard items
+clipboard_items=$(cliphist list)
+
+# Check if clipboard history is empty
+options_count=$(echo "$clipboard_items" | grep -v -E '^$' | wc -l)
+
+if [[ "$options_count" -eq 0 ]]; then
+    notify-send "Clipboard" "History is empty" --icon=edit-paste
+    exit 0
+fi
+
+# Calculate dynamic lines to prevent empty bottom space (cap at 10)
+lines=$(( options_count < 10 ? options_count : 10 ))
+
+selected=$(echo "$clipboard_items" | fuzzel \
+  --dmenu \
+  --width=60 \
+  --lines="$lines" \
+  --prompt="Clipboard  ")
+
+[[ -z "$selected" ]] && exit 0
+
+echo "$selected" | cliphist decode | wl-copy

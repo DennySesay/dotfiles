@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# Kanagawa Dragon themed fuzzel power menu
+
+# Options
+lock="󰌾  Lock"
+logout="󰍃  Logout"
+suspend="󰤄  Suspend"
+reboot="󰑐  Reboot"
+shutdown="󰐥  Shutdown"
+
+menu_options="$lock\n$logout\n$suspend\n$reboot\n$shutdown"
+
+# Calculate dynamic lines to prevent empty bottom space
+options_count=$(echo -e "$menu_options" | grep -v -E '^$' | wc -l)
+lines=$(( options_count < 10 ? options_count : 10 ))
+
+# Launch fuzzel in dmenu mode
+selected=$(echo -e "$menu_options" | fuzzel \
+  --dmenu \
+  --width=15 \
+  --lines="$lines" \
+  --prompt="Power  ")
+
+case "$selected" in
+    "$lock")
+        hyprlock
+        ;;
+    "$logout")
+        hyprctl dispatch exit
+        ;;
+    "$suspend")
+        systemctl suspend
+        ;;
+    "$reboot")
+        systemctl reboot
+        ;;
+    "$shutdown")
+        systemctl poweroff
+        ;;
+esac

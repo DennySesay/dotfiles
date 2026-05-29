@@ -1,0 +1,227 @@
+@define-color background #12120f;
+@define-color foreground #c5c9c5;
+@define-color black0 #0d0c0c;
+@define-color sumiInk2 #1d1c19;
+@define-color dragonGray #a6a69c;
+@define-color dragonBlue #658594;
+@define-color dragonGreen #87a987;
+@define-color dragonRed #c4746e;
+@define-color dragonYellow #c4b28a;
+@define-color dragonOrange #b6927b;
+@define-color dragonPink #a292a3;
+
+* {
+  border: none;
+  border-radius: 0px;
+  min-height: 20px;
+  font-family: 'JetBrainsMono Nerd Font', 'Noto Sans CJK JP', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+window#waybar {
+  background-color: transparent;
+}
+
+window#waybar > box {
+  border-radius: 14px;
+  border: 1px solid alpha(@dragonGray, 0.15);
+  margin: 4px 8px;
+  background-color: alpha(@background, 0.75);
+}
+
+#left1, #left2, #right1 {
+  background-color: alpha(@foreground, 0.05);
+  margin: 4px 2px;
+  padding: 0px 8px; 
+}
+
+#left1 {
+  margin-left: 4px;
+  padding-left: 6px;
+  border-radius: 10px 4px 4px 10px;
+}
+
+#left2 {
+  border-radius: 4px;
+  padding: 0px 10px; 
+}
+
+#right1 {
+  margin-right: 4px;
+  padding-right: 6px;
+  border-radius: 4px 10px 10px 4px;
+}
+
+/* --- Workspaces --- */
+
+button {
+  box-shadow: inset 0 -3px transparent;
+  border: none;
+  border-radius: 0;
+  transition: 0.3s ease-in-out;
+}
+
+button:hover {
+  background: inherit;
+}
+
+#workspaces {
+  border-radius: 10px;
+  background-color: transparent;
+  margin: 4px 0px;
+  padding: 0px;
+}
+
+#workspaces button {
+  padding: 0px 8px;
+  margin: 0px 2px;
+  border-radius: 6px;
+  color: alpha(@foreground, 0.5);
+  background-color: transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+#workspaces button.active {
+  background-color: alpha(@dragonBlue, 0.25);
+  color: @dragonBlue;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+#workspaces button.empty {
+  color: alpha(@foreground, 0.2);
+  background-color: transparent;
+  box-shadow: none;
+}
+
+#workspaces button.empty.active {
+  background-color: alpha(@dragonBlue, 0.15);
+  color: alpha(@dragonBlue, 0.8);
+  border-radius: 6px;
+  box-shadow: none;
+  margin: 0px 2px;
+  padding: 0px 8px;
+  opacity: 1;
+}
+
+#workspaces button:hover.empty,
+#workspaces button:hover {
+  background-color: @dragonBlue;
+  color: @black0;
+  opacity: 1;
+}
+
+#idle_inhibitor,
+#custom-updatespacman,
+#custom-menu,
+#clock,
+#custom-notification,
+#tray,
+#cpu,
+#memory,
+#battery,
+#backlight,
+#network,
+#power-profiles-daemon,
+#bluetooth,
+#pulseaudio {
+  min-width: 10px;
+  margin: 0px;
+  padding: 0px 6px;
+  background-color: transparent;
+  color: @foreground;
+}
+
+tooltip {
+  padding: 2px;
+}
+
+#custom-menu, #clock {
+  background-color: transparent;
+  margin: 0px;
+  padding: 0px 4px;
+}
+
+#custom-menu {
+  font-size: 16px;
+  color: @dragonRed;
+}
+
+#power-profiles-daemon,
+#power-profiles-daemon.performance,
+#power-profiles-daemon.balanced,
+#power-profiles-daemon.power-saver {
+  padding-right: 8px;
+}
+
+#custom-notification {
+  min-width: 12px;
+  margin-left: 0;
+  margin-right: 0;
+  font-size: 12px;
+  padding-bottom: 0px;
+  color: @foreground;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background-color: transparent;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+tooltip {
+  padding: 4px;
+  background: @sumiInk2;
+  border: 1px solid alpha(@dragonGray, 0.3);
+  border-radius: 8px;
+}
+
+tooltip label {
+  color: @foreground;
+  font-weight: normal;
+  font-size: 10px;
+}
+
+#mpris {
+  background-color: alpha(@foreground, 0.05);
+  margin: 4px 2px;
+  padding: 0px 10px;
+  border-radius: 4px;
+  color: @dragonGreen;
+  box-shadow: none;
+  animation: blink 3s linear infinite alternate;
+}
+
+@keyframes blink {
+  to { color: alpha(@dragonGreen, 0.4); }
+}
+
+#battery.warning {
+  color: @dragonOrange;
+  background-color: transparent;
+}
+
+@keyframes blink2 {
+  to {
+    background-color: transparent;
+    color: @dragonRed;
+  }
+}
+
+#battery.critical:not(.charging) {
+  background-color: transparent;
+  color: @dragonYellow;
+  animation-name: blink2;
+  animation-duration: 0.5s;
+  animation-timing-function: steps(12);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}

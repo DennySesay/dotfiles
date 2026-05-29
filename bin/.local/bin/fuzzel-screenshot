@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Options
+full="󰹑  Fullscreen"
+area="󰩬  Select Area"
+window="󰖯  Active Window"
+
+menu_options="$full\n$area\n$window"
+
+# Calculate dynamic lines to prevent empty bottom space
+options_count=$(echo -e "$menu_options" | grep -v -E '^$' | wc -l)
+lines=$(( options_count < 10 ? options_count : 10 ))
+
+selected=$(echo -e "$menu_options" | fuzzel \
+  --dmenu \
+  --width=20 \
+  --lines="$lines" \
+  --prompt="Screenshot  ")
+
+# Exit if nothing selected
+[[ -z "$selected" ]] && exit 0
+
+case "$selected" in
+    "$full")
+        hyprshot -m output -o ~/Pictures/Screenshots
+        ;;
+    "$area")
+        hyprshot -m region -o ~/Pictures/Screenshots
+        ;;
+    "$window")
+        hyprshot -m window -o ~/Pictures/Screenshots
+        ;;
+esac

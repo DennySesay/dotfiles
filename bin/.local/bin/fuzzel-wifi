@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+# Get list of Wi-Fi networks (excluding duplicates and empty names) from cache instantly
+get_wifi_list() {
+    nmcli --fields SSID,SECURITY,BARS device wifi list --rescan no | tail -n +2 | grep -v -E '^--' | awk -F'  +' '{printf "%-25s | %-15s | %s\n", $1, $2, $3}'
+}
+
+# Check Wi-Fi status
+wifi_state=$(nmcli -fields WIFI g)
+
+if [[ "$wifi_state" =~ "enabled" ]]; then
+    toggle="󰖪  Disable Wi-Fi"
+    wifi_list=$(get_wifi_list)
+else
+    toggle="󰖩  Enable Wi-Fi"
+    wifi_list=""
+fi
+
+# Combine list with a Refresh option
+if [[ "$wifi_state" =~ "enabled" ]]; then
+    menu_options="$toggle\n󰑐  Refresh Networks\n$wifi_list"
+else
+    menu_options="$toggle"
+fi
+
+# Calculate dynamic lines to prevent empty space at the bottom (cap at 10)
+options_count=$(echo -e "$menu_options" | grep -v -E '^$' | wc -l)
+lines=$(( options_count < 10 ? options_count : 10 ))
+
+selected=$(echo -e "$menu_options" | fuzzel \
+  --dmenu \
+  --width=50 \
+  --lines="$lines" \
+  --prompt="Wi-Fi  ")
+
+# Exit if nothing selected
+[[ -z "$selected" ]] && exit 0
+
+if [[ "$selected" == "$toggle" ]]; then
+    if [[ "$wifi_state" =~ "enabled" ]]; then
+        nmcli radio wifi off
+    else
+        nmcli radio wifi on
+        sleep 0.5
+        exec "$0"
+    fi
+elif [[ "$selected" == *"Refresh Networks"* ]]; then
+    # Trigger active scan in the background
+    nmcli device wifi rescan >/dev/null 2>&1 &
+    notify-send "Wi-Fi" "Scanning for networks..." --icon=network-wireless
+    sleep 1.2
+    exec "$0"
+else
+    # Extract SSID and security
+    ssid=$(echo "$selected" | cut -d'|' -f1 | xargs)
+    security=$(echo "$selected" | cut -d'|' -f2 | xargs)
+    
+    # Check if network is already saved
+    if nmcli connection show | grep -q "$ssid"; then
+        nmcli device wifi connect "$ssid"
+    else
+        # If secured, prompt for password
+        if [[ "$security" != "--" && ! -z "$security" ]]; then
+            password=$(fuzzel --dmenu --prompt="Password for $ssid: " --password)
+            [[ -z "$password" ]] && exit 0
+            nmcli device wifi connect "$ssid" password "$password"
+        else
+            nmcli device wifi connect "$ssid"
+        fi
+    fi
+fi
