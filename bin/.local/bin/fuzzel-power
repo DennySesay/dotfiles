@@ -23,19 +23,19 @@ selected=$(echo -e "$menu_options" | fuzzel \
   --prompt="Power  ")
 
 case "$selected" in
-    "$lock")
+    *Lock*)
         hyprlock
         ;;
-    "$logout")
-        hyprctl dispatch exit
+    *Logout*)
+        hyprctl dispatch 'hl.dsp.exit()' || loginctl terminate-user "$USER" || killall -9 Hyprland
         ;;
-    "$suspend")
+    *Suspend*)
         systemctl suspend
         ;;
-    "$reboot")
+    *Reboot*)
         systemctl reboot
         ;;
-    "$shutdown")
+    *Shutdown*)
         systemctl poweroff
         ;;
 esac

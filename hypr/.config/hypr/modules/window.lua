@@ -58,3 +58,40 @@ hl.window_rule({
     size  = "640 360",
     move  = "100%-650 100%-370",
 })
+
+-- Scratchpad / Magic workspace floating overlay rules
+hl.window_rule({
+    name  = "scratchpad-main",
+    match = { class = "scratchpad-main" },
+    float = true,
+    size  = "1228 870",
+    move  = "665 100",
+    workspace = "special:magic",
+})
+
+hl.window_rule({
+    name  = "scratchpad-btop",
+    match = { class = "scratchpad-btop" },
+    float = true,
+    size  = "588 810",
+    move  = "1920 130",
+    workspace = "special:magic",
+})
+
+hl.window_rule({
+    name  = "scratchpad-music",
+    match = { class = "scratchpad-music" },
+    float = true,
+    size  = "588 388",
+    move  = "50 130",
+    workspace = "special:magic",
+})
+
+hl.window_rule({
+    name  = "scratchpad-cava",
+    match = { class = "scratchpad-cava" },
+    float = true,
+    size  = "588 388",
+    move  = "50 550",
+    workspace = "special:magic",
+})

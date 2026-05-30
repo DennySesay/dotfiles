@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+# File to track current state
+STATE_FILE="/tmp/hyprsunset_state"
+LAST_ACTIVE_FILE="/tmp/hyprsunset_last_active"
+
+# Default temperatures to cycle: 6000K, 5000K, 4000K, 3000K
+TEMPS=(6000 5000 4000 3000)
+
+get_current_temp() {
+    if [ -f "$STATE_FILE" ]; then
+        cat "$STATE_FILE"
+    else
+        echo "6000"
+    fi
+}
+
+send_notification() {
+    local temp=$1
+    if [ "$temp" = "identity" ]; then
+        notify-send -r 9987 -u low -i night-light "Hyprsunset" "Blue-light filter: DISABLED"
+    else
+        notify-send -r 9987 -u low -i night-light "Hyprsunset" "Screen Temperature: ${temp}K"
+    fi
+}
+
+toggle() {
+    local current=$(get_current_temp)
+    if [ "$current" = "identity" ]; then
+        # Restore last active temperature or default to 4000
+        local last_active=4000
+        if [ -f "$LAST_ACTIVE_FILE" ]; then
+            last_active=$(cat "$LAST_ACTIVE_FILE")
+        fi
+        hyprctl hyprsunset temperature "$last_active"
+        echo "$last_active" > "$STATE_FILE"
+        send_notification "$last_active"
+    else
+        # Save current as last active before disabling
+        echo "$current" > "$LAST_ACTIVE_FILE"
+        hyprctl hyprsunset identity
+        echo "identity" > "$STATE_FILE"
+        send_notification "identity"
+    fi
+}
+
+cycle() {
+    local current=$(get_current_temp)
+    local next_temp=""
+    
+    # If currently identity, start at a reasonable warm temperature
+    if [ "$current" = "identity" ]; then
+        next_temp="4000"
+    else
+        # Find index of current temp
+        local idx=-1
+        for i in "${!TEMPS[@]}"; do
+            if [ "${TEMPS[$i]}" = "$current" ]; then
+                idx=$i
+                break
+            fi
+        done
+        
+        # Cycle to the next index
+        local next_idx=$(( (idx + 1) % ${#TEMPS[@]} ))
+        next_temp="${TEMPS[$next_idx]}"
+    fi
+    
+    hyprctl hyprsunset temperature "$next_temp"
+    echo "$next_temp" > "$STATE_FILE"
+    echo "$next_temp" > "$LAST_ACTIVE_FILE"
+    send_notification "$next_temp"
+}
+
+case "$1" in
+    toggle)
+        toggle
+        ;;
+    cycle)
+        cycle
+        ;;
+    *)
+        echo "Usage: $0 {toggle|cycle}"
+        exit 1
+        ;;
+esac

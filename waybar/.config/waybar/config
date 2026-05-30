@@ -28,7 +28,14 @@
     "hyprland/workspaces"
   ],
   "modules-right": [
-    "mpris",
+    "mpris#spotatui",
+    "mpris#cliamp",
+    "mpris#spotify",
+    "mpris#vlc",
+    "mpris#mpv",
+    "mpris#cider",
+    "mpris#cmus",
+    "mpris#celluloid",
     "group/right1"
   ],
   "group/right1": {
@@ -194,17 +201,101 @@
       "class<PrusaSlicer|UltiMaker-Cura|OrcaSlicer>": " 󰐥"
     }
   },
-  "mpris": {
+  "mpris#spotatui": {
+    "player": "spotatui",
+    "interval": 1,
     "format": " {dynamic}",
-    "format-paused": "{status_icon} {dynamic}",
-    "interval": 1, 
-    "dynamic-order": ["artist", "position", "length"], 
-    "dynamic-importance-order": ["position", "length", "artist"],
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
     "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
     "status-icons": {
       "paused": "󰝛"
-    },
-    "ignored-players": ["firefox", "brave"]
+    }
+  },
+  "mpris#cliamp": {
+    "player": "cliamp",
+    "interval": 1,
+    "format": " {dynamic}",
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
+    "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
+    "status-icons": {
+      "paused": "󰝛"
+    }
+  },
+  "mpris#spotify": {
+    "player": "spotify",
+    "interval": 1,
+    "format": " {dynamic}",
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
+    "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
+    "status-icons": {
+      "paused": "󰝛"
+    }
+  },
+  "mpris#vlc": {
+    "player": "vlc",
+    "interval": 1,
+    "format": " {dynamic}",
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
+    "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
+    "status-icons": {
+      "paused": "󰝛"
+    }
+  },
+  "mpris#mpv": {
+    "player": "mpv",
+    "interval": 1,
+    "format": " {dynamic}",
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
+    "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
+    "status-icons": {
+      "paused": "󰝛"
+    }
+  },
+  "mpris#cider": {
+    "player": "cider",
+    "interval": 1,
+    "format": " {dynamic}",
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
+    "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
+    "status-icons": {
+      "paused": "󰝛"
+    }
+  },
+  "mpris#cmus": {
+    "player": "cmus",
+    "interval": 1,
+    "format": " {dynamic}",
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
+    "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
+    "status-icons": {
+      "paused": "󰝛"
+    }
+  },
+  "mpris#celluloid": {
+    "player": "celluloid",
+    "interval": 1,
+    "format": " {dynamic}",
+    "format-paused": "{status_icon} {dynamic}", 
+    "dynamic-order": ["title", "position", "length"], 
+    "dynamic-importance-order": ["position", "length", "title"],
+    "tooltip-format": "{player} ({status}):\n{artist} - {title}",  
+    "status-icons": {
+      "paused": "󰝛"
+    }
   },
   "backlight": {
     "device": "intel_backlight",

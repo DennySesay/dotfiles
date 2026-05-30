@@ -75,17 +75,18 @@ button:hover {
 
 #workspaces button {
   padding: 0px 8px;
-  margin: 0px 2px;
-  border-radius: 6px;
-  color: alpha(@foreground, 0.5);
-  background-color: transparent;
-  transition: all 0.2s ease-in-out;
+  margin: 0px 3px;
+  border-radius: 8px;
+  color: alpha(@foreground, 0.4);
+  background-color: alpha(@foreground, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #workspaces button.active {
-  background-color: alpha(@dragonBlue, 0.25);
-  color: @dragonBlue;
-  border-radius: 6px;
+  background-color: @dragonBlue;
+  color: @black0;
+  border-radius: 8px;
+  padding: 0px 16px;
   font-weight: bold;
 }
 
@@ -96,19 +97,19 @@ button:hover {
 }
 
 #workspaces button.empty.active {
-  background-color: alpha(@dragonBlue, 0.15);
-  color: alpha(@dragonBlue, 0.8);
-  border-radius: 6px;
+  background-color: alpha(@dragonBlue, 0.2);
+  color: @dragonBlue;
+  border-radius: 8px;
   box-shadow: none;
-  margin: 0px 2px;
-  padding: 0px 8px;
+  margin: 0px 3px;
+  padding: 0px 14px;
   opacity: 1;
 }
 
 #workspaces button:hover.empty,
 #workspaces button:hover {
-  background-color: @dragonBlue;
-  color: @black0;
+  background-color: alpha(@dragonBlue, 0.35);
+  color: @foreground;
   opacity: 1;
 }
 
